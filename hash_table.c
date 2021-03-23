@@ -62,14 +62,14 @@ int main(){
     printf("\nTrying to demonstrate the readdition of Jane with the External Chaining Idea\n");
     insert_head_external_chaining_method(&jane, hash_table);
     insert_head_external_chaining_method(&jane, hash_table);
-    insert_head_external_chaining_method(&jane, hash_table);
-    insert_tail_external_chaining(&jane, hash_table);
+    //insert_head_external_chaining_method(&jane, hash_table);
+    //insert_tail_external_chaining(&jane, hash_table);
     print_hash_table(hash_table);
     
-    printf("\nDeleting the Robert/Inserting him back in with external chaining\n"
-            "Since he has the same hash as Jacob, he'll be downstream of Jacob.\n");
-    delete_person_hash_table(&robert, hash_table);
-    insert_head_external_chaining_method(&robert, hash_table);
+    //printf("\nDeleting the Robert/Inserting him back in with external chaining\n"
+            //"Since he has the same hash as Jacob, he'll be downstream of Jacob.\n");
+    //delete_person_hash_table(&robert, hash_table);
+    //insert_head_external_chaining_method(&robert, hash_table);
 
     printf("Deleting Edna, then inserting user's choice of person to hash_table\n");
     delete_person_hash_table(&edna, hash_table);
