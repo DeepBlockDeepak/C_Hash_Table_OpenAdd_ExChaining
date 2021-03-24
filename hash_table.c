@@ -9,15 +9,6 @@ int main(){
 
     struct person_t* hash_table[TABLESIZE];
 
-    /**
-     * @bug     Originally passed '&hash_table' as argument; code compiled but with warning:
-     *               "hash_table.h:27:41: note: expected ‘struct person_t **’ but argument is of type ‘struct person_t * (*)[10]’"
-     *          
-     *          Updated to just 'hash_table' as the argument
-     * 
-     *          ----WHY does the code compile either way? C is usually too finnicky to allow this
-     * 
-     */
     init_hash_table(hash_table);
 
     //Declare a bunch of person_t struct nodes.... initialized so that each .next attribute is NULL
@@ -45,12 +36,6 @@ int main(){
     insert_person_hash_table(&jane, hash_table);
     insert_person_hash_table(&bilbo, hash_table);
 
-    /**
-     * @bug     HOW DO YOU PASS A PERSON STRUCT POINTER TO THE INSERTION_CHAINING() FUNCTION WITHOUT MODIFYING THE ORIGINAL PERSON STRUCT????
-     * 
-     */
-    
-    
     printf("\n-----People Inserted in Hash Table-----\n");
     print_hash_table(hash_table);
 
