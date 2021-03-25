@@ -25,7 +25,7 @@ int print_menu(){
             "\t7) QUIT?\n\n"
     );
     
-    fgets(buf, MAX_NAME + 1, stdin);
+    fgets(buf, MAX_NAME, stdin);
     sscanf(buf, "%d", &user_choice);
 
     return user_choice;
@@ -35,6 +35,7 @@ int print_menu(){
 // @BUG possibly change second parameter!
 void control_to_function_calls(int user_choice, struct person_t* hash_table[]){
 
+    //this struct required to accept the return of the find_person() call. 
     struct person_t *person_of_interest = NULL;
     
     switch (user_choice){
@@ -144,7 +145,7 @@ unsigned int hash(char *name){
  * @param person    the struct node to insert into the array
  * @param table     the array of struct pointers --- the hash table
  */
-void insert_person_hash_table(struct person_t *person ,struct person_t* *table){
+void insert_open_add_method(struct person_t *person ,struct person_t* *table){
 
     if(!(person)){
         return;
@@ -163,6 +164,9 @@ void insert_person_hash_table(struct person_t *person ,struct person_t* *table){
         }
     }
 
+    //if the hash_table is fully occupied, then the person was not added
+    printf("There was no more room in the table\n");
+    free(person);
     return;
 
 }
@@ -175,9 +179,10 @@ void insert_dynamically(struct person_t* *hash_table, int user_choice_for_type_o
     //decided to just sscanf person_name back into itself.
     //char *tmp = (char *) calloc(MAX_NAME, sizeof(char));
 
-    int person_age;
+
     //create space for the user name
     char *person_name = (char *) calloc(MAX_NAME, sizeof(char));
+    int person_age;
 
     printf("Type the person's name, please: ");
     fgets(person_name, MAX_NAME, stdin);
@@ -185,6 +190,13 @@ void insert_dynamically(struct person_t* *hash_table, int user_choice_for_type_o
 
     printf("Enter the person's age\n");
     scanf("%d", &person_age);
+
+    /**
+     * @bug     Was having an issue with the main menu being printed twice after inserting a person.
+     *          Solved by inserting the getchar() instance here. It's not cool.
+     * 
+     */
+    while ((getchar()) != '\n');
     //fgets(person_age, 16, stdin);
 
     struct person_t* new_person = (struct person_t*) malloc(sizeof(struct person_t));
@@ -196,7 +208,7 @@ void insert_dynamically(struct person_t* *hash_table, int user_choice_for_type_o
 
     switch (user_choice_for_type_of_insertion){
     case OPEN_ADDRESS_INSERT:
-        insert_person_hash_table(new_person, hash_table);
+        insert_open_add_method(new_person, hash_table);
         break;
 
     case EXTERN_HEAD:

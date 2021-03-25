@@ -14,7 +14,7 @@ int main(){
 
     int user_choice = 0;
 
-    do{
+    while (user_choice != QUIT){
 
         user_choice = print_menu();
 
@@ -25,7 +25,7 @@ int main(){
         
         control_to_function_calls(user_choice, hash_table);
 
-    }while (user_choice != QUIT);
+    }
 
     return 0;
 }

@@ -40,7 +40,7 @@ void print_hash_table(struct person_t* *table);
 
 unsigned int hash(char *name);
 
-void insert_person_hash_table(struct person_t *person ,struct person_t* *table);
+void insert_open_add_method(struct person_t *person ,struct person_t* *table);
 
 void insert_dynamically(struct person_t* *hash_table, int user_choice_for_type_of_insertion);
 
