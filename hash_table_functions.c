@@ -14,15 +14,15 @@ int print_menu(){
     int user_choice;
     
     printf(
-            "\nWould you like to enter a person, using:\n"
-            "\t1) Open Addressing/Linear Probing?\n"
-            "\t2) External Chaining- as the HEAD node?\n"
-            "\t3) External Chaining- as the TAIL node?\n"
-            "\nOR:\n"
-            "\t4) Find a person?\n"
-            "\t5) Delete a person?\n"
-            "\t6) PRINT the Table?\n"
-            "\t7) QUIT?\n\n"
+            "\n\tWould you like to enter a person, using:\n"
+            "\t\t1) Open Addressing/Linear Probing?\n"
+            "\t\t2) External Chaining- as the HEAD node?\n"
+            "\t\t3) External Chaining- as the TAIL node?\n"
+            "\n\tOR:\n"
+            "\t\t4) Find a person?\n"
+            "\t\t5) Delete a person?\n"
+            "\t\t6) PRINT the Table?\n"
+            "\t\t7) QUIT?\n\n"
     );
     
     fgets(buf, MAX_NAME, stdin);
@@ -53,10 +53,11 @@ void control_to_function_calls(int user_choice, struct person_t* hash_table[]){
         break;
 
     case FIND:
+
         person_of_interest = find_person(hash_table);
 
-        person_of_interest  ?   printf("%s is in the hash table\n", (*person_of_interest).name)
-                            :   printf("They are not in the table\n");
+        person_of_interest  ?   printf("\n\t:) %s is in the hash table**\n", (*person_of_interest).name)
+                            :   printf("\n\t**That person isn't in the table.**\n");
 
         break;
 
@@ -113,7 +114,6 @@ void print_hash_table(struct person_t* *table){
             printf("\t%d\t", i);
             while(person){
                 printf(!(person->next) ? "%s, %d\n" : "%s, %d -> ", person->name, person->age);
-                //printf("\t%d\t%s ,%d ->",i, person->name, person->age);//printf("\t%d\t%s\t%d\n",i, (*(*(table + i))).name, table[i]->age);//
                 person = person->next;
             }
 
@@ -188,7 +188,7 @@ void insert_dynamically(struct person_t* *hash_table, int user_choice_for_type_o
     fgets(person_name, MAX_NAME, stdin);
     sscanf(person_name, "%s", person_name);
 
-    printf("Enter the person's age\n");
+    printf("Enter the person's age: ");
     scanf("%d", &person_age);
 
     /**
@@ -235,7 +235,7 @@ void insert_dynamically(struct person_t* *hash_table, int user_choice_for_type_o
 void delete_person_hash_table(struct person_t *person, struct person_t* *table){
    
     if(!person){
-        printf("That person isn't here.\n");
+        printf("\n\t**That person isn't in the table.**\n");
         return;
     }
 
@@ -370,8 +370,14 @@ void insert_head_external_chaining_method(struct person_t* person, struct person
 
 void insert_tail_external_chaining(struct person_t* person, struct person_t* *table){
     
-    
+
+    //compute the hash value
     int index = hash(person->name);
+    //disallow the user to insert with the tail method when the current *(table+index) slot is NULL
+    if(!(*(table + index))){
+        printf("\n**Cannot insert a tail until a head is first placed.**\n");
+        return;
+    }
 
     struct person_t *tmp, *tail = NULL;
 
