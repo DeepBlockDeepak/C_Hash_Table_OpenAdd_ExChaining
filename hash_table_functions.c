@@ -1,15 +1,15 @@
 #include "hash_table.h"
 
+
 /**
- * @bug NEED TO BE ABLE TO INSERT_CHAIN_TAIL when the list is empty
- *      Not print the list if it's empty 
+ * @brief   Prints the user_interface. Allows user to make selections for hash table functions
+ * 
+ * @return int      The user's choice
  */
-
-
 int print_menu(){
 
     //buf needed to stuff away user input
-    //tmp needed to store integer of user choice
+    //buf material sent to the user_choice
     char buf[MAX_NAME];
     int user_choice;
     
@@ -32,13 +32,20 @@ int print_menu(){
 
 }
 
-// @BUG possibly change second parameter!
+
+/**
+ * @brief   Takes the user's menu choice, and determines which function call needs to be performed
+ * 
+ * @param user_choice   Return from the print_menu() selection 
+ * @param hash_table    A pointer to the hash table
+ */
 void control_to_function_calls(int user_choice, struct person_t* hash_table[]){
 
-    //this struct required to accept the return of the find_person() call. 
+    //this struct required to accept the return of the find_person() call within the FIND and DELETE choices 
     struct person_t *person_of_interest = NULL;
     
     switch (user_choice){
+    //user quits the program
     case QUIT:
         break;
     
@@ -46,12 +53,14 @@ void control_to_function_calls(int user_choice, struct person_t* hash_table[]){
         print_hash_table(hash_table);
         break;
 
+    //in each case, an insertion will occur by malloc'ing a new struct 
     case OPEN_ADDRESS_INSERT:
     case EXTERN_HEAD:
     case EXTERN_TAIL:
         insert_dynamically(hash_table, user_choice);
         break;
 
+    //checks if a name is already in the array
     case FIND:
 
         person_of_interest = find_person(hash_table);
@@ -80,7 +89,7 @@ void control_to_function_calls(int user_choice, struct person_t* hash_table[]){
  * @brief   Array of pointers to 'people' structs
  *          *Use pointers because of space!
  *              -You don't need space for the full table unless the table is filled
- *          *
+ *          
  */
 
 void init_hash_table(struct person_t **hash_table){
@@ -98,22 +107,33 @@ void print_hash_table(struct person_t* *table){
     printf("\n\t{\n");
 
     for(int i = 0; i < TABLESIZE; i++){
-        //if the element is NULL
+        
+        //if the element is NULL, i.e. no person has ever entered this slot
         if(!(*(table + i))){
             printf("\t%d\t---\n", i);
         }
 
+        //slot is neither NULL nor does it contain a person. Formerly contained a person, since deleted
         else if(table[i] == DELETED_NODE){
             printf("\t%d\t----<deleted>\n", i);
         }
 
 
+        //handles any amount of nodes at the slot in the table
         else{
-
+            
+            //set a temporary pointer, person, to the slot in the table
             struct person_t* person = table[i];
             printf("\t%d\t", i);
+
             while(person){
-                printf(!(person->next) ? "%s, %d\n" : "%s, %d -> ", person->name, person->age);
+                printf(
+                    !(person->next) ? "%s, %d\n"        //if the current node is the very last
+                                    : "%s, %d -> ",     //every other node
+                                    person->name, person->age
+                );
+
+                //increment the node pointer
                 person = person->next;
             }
 
@@ -125,11 +145,18 @@ void print_hash_table(struct person_t* *table){
 }
 
 
-//returns a ghetto hashing value for an inputted char
+/**
+ * @brief   returns a ghetto hashing value for an inputted char
+ * 
+ * @param name  the string literal of the person's name member variable
+ * @return unsigned int     the value of the hash, normalized to fit inside range(0, len(hash_table) - 1)
+ */
 unsigned int hash(char *name){
+
     int length = strnlen(name, MAX_NAME);
     unsigned int hash_value = 0;
 
+    //iterate over each char, and mix up the hash_value with squaring method.... uses modulo to keep in-bounds
     for (int i = 0; i < length; i++){
         hash_value += *(name + i);
         hash_value = (hash_value *  name[i]) % TABLESIZE;
@@ -147,17 +174,18 @@ unsigned int hash(char *name){
  */
 void insert_open_add_method(struct person_t *person ,struct person_t* *table){
 
+    //check here for a junk person
     if(!(person)){
         return;
     }
 
     int index = hash(person->name);
 
+    //open addressing checks each available spot 
     for(int i = 0; i < TABLESIZE; i++){
         //make sure to keep 'try_index' in bounds with modulo 
         int try_index = (index + i) % TABLESIZE;
         //if the index/hash is not already taken in the hash_table, insert the person here
-        //This will allow a repeated hash index to still insert... potentially
         if(table[try_index] == NULL || table[try_index] == DELETED_NODE){
             table[try_index] = person;
             return;
@@ -177,7 +205,7 @@ void insert_dynamically(struct person_t* *hash_table, int user_choice_for_type_o
 
     //initially declared 'tmp' to help with the "eating of the space char" in person_name
     //decided to just sscanf person_name back into itself.
-    //char *tmp = (char *) calloc(MAX_NAME, sizeof(char));
+    //          char *tmp = (char *) calloc(MAX_NAME, sizeof(char));
 
 
     //create space for the user name
@@ -192,16 +220,15 @@ void insert_dynamically(struct person_t* *hash_table, int user_choice_for_type_o
     scanf("%d", &person_age);
 
     /**
-     * @bug     Was having an issue with the main menu being printed twice after inserting a person.
+     * @bug     SOLVED: Was having an issue with the main menu being printed twice after inserting a person.
      *          Solved by inserting the getchar() instance here. It's not cool.
-     * 
      */
     while ((getchar()) != '\n');
-    //fgets(person_age, 16, stdin);
 
+    //creating the new struct here, and the user input will be assigned to its members
     struct person_t* new_person = (struct person_t*) malloc(sizeof(struct person_t));
 
-    //(*new_person).name = person_name;
+    //(*new_person).name = person_name //@bug This is a char*(?) bug.... used strcpy instead
     strcpy((*new_person).name, person_name);
     (*new_person).age = person_age;
     new_person->next = NULL;
