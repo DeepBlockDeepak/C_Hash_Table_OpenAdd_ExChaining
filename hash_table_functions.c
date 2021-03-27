@@ -208,6 +208,8 @@ void insert_dynamically(struct person_t* *hash_table, int user_choice_for_type_o
     //          char *tmp = (char *) calloc(MAX_NAME, sizeof(char));
 
 
+    /**************         Creation of the new node, and assignment of user input to the struct variables         **************/
+    
     //create space for the user name
     char *person_name = (char *) calloc(MAX_NAME, sizeof(char));
     int person_age;
@@ -233,6 +235,9 @@ void insert_dynamically(struct person_t* *hash_table, int user_choice_for_type_o
     (*new_person).age = person_age;
     new_person->next = NULL;
 
+    /**************         Node has been created and is ready to be passed to the relevant function call         **************/
+
+    //Switch depending on the method of the user's choice
     switch (user_choice_for_type_of_insertion){
     case OPEN_ADDRESS_INSERT:
         insert_open_add_method(new_person, hash_table);
@@ -261,47 +266,46 @@ void insert_dynamically(struct person_t* *hash_table, int user_choice_for_type_o
  */
 void delete_person_hash_table(struct person_t *person, struct person_t* *table){
    
+   //Guard against a trash person
     if(!person){
         printf("\n\t**That person isn't in the table.**\n");
         return;
     }
 
 
-    //compute the hash index
+    //compute the hash index, and store into 'index'
     int index = hash(person->name);
 
-    //search the table for the index associated with the name and NULLify
+    //search the table for the index associated with the name and NULL-ify
     for(int i = 0; i < TABLESIZE; i++){
 
         int try_index = (index + i) % TABLESIZE;
         
+        //You can safely ignore the DELETED_NODE address
         if(table[try_index] == DELETED_NODE){
             continue;
         }
+
+        //NULL means that the computed try_index was never possibly inserted into the table, so break the function here
         if (table[try_index] == NULL){
             return;
         }
 
 
-    /**
-     * @brief probably need to make 2 different IFS
-     * 
-     *          One for when the encountered element is a linked list... (Test IF(table[index]->next) to determine that .next!=NULL)
-     *          Another for when IF(!table[index]->next) so a simple deletion can take place without list traversing
-     * 
-     */
+        //In the case where the encountered slot of the hash table is a linked list, meaning that external chaining has occurred here 
+        /** @todo THIS METHOD only deletes the node if it is at the head. DOES NOT incorporate a linked list traversal if node is downstream.*/
         if(table[try_index]->name == person->name){
-            //printf("%s\n%s\n", BUG, table[try_index]->name);
-            //Probably need to add a list traversal deletion loop. Might need free() but I don't know how that works for run-time nodes
 
-            struct person_t* leader = table[index]->next;
+            //leader is required so as to not modify the current slot directly
+            //Initially this was a problem when inserting person structs directly in the source code.
+            struct person_t* leader = table[try_index]->next;
             while(leader){
-                free(table[index]);
-                table[index] = leader;
+                free(table[try_index]);
+                table[try_index] = leader;
                 leader = leader->next;
             }
-            //free(table[index]);
 
+            //does this struct, at table[try_index] need to be freed first????
             table[try_index] = DELETED_NODE;    //DELETED_NODE is the sentinel value
             //table[try_index]->next = NULL;
             return;
