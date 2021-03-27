@@ -1,3 +1,11 @@
+/**
+ * @file    hash_table.c
+ * @author  Jordan Medina (jordan.medina@student.nmt.edu)
+ * @brief   Does hash table work, using Open Addressing and External Chaining
+ * @date    2021-03-26
+ * @details Necessary files: hash_table_functions.c and hash_table.h to compile
+ */
+
 #include "hash_table.h"
 
 
@@ -9,7 +17,6 @@
             Entire script quits when the user is done.
  
  CREATE SOME PERSON STRUCTS.... INSERT THEM INTO AN ARRAY OF STRUCT POINTERS
-
 
  */
 int main(){

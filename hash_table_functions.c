@@ -1,3 +1,11 @@
+/**
+ * @file    hash_table_functions.c
+ * @author  Jordan Medina (jordan.medina@student.nmt.edu)
+ * @brief   Stores the function definitions used for the hash_table.c driver script
+ * @date    2021-03-26
+ * @details Necessary files: hash_table.h and hash_table.c  
+ */
+
 #include "hash_table.h"
 
 
@@ -262,7 +270,7 @@ void insert_dynamically(struct person_t* *hash_table, int user_choice_for_type_o
 
 
 /**
- * @brief Goal is to find a head pointer at table[index] and assign the DELETED_NODE address here. Not sure how this works for linked list members yet
+ * @brief   Deletes a person if they are at the head of a slot
  */
 void delete_person_hash_table(struct person_t *person, struct person_t* *table){
    
@@ -297,7 +305,7 @@ void delete_person_hash_table(struct person_t *person, struct person_t* *table){
         if(table[try_index]->name == person->name){
 
             //leader is required so as to not modify the current slot directly
-            //Initially this was a problem when inserting person structs directly in the source code.
+            //Initially this was a problem when inserting person structs directly in the source code.(see line 442)
             struct person_t* leader = table[try_index]->next;
             while(leader){
                 free(table[try_index]);
@@ -318,7 +326,12 @@ void delete_person_hash_table(struct person_t *person, struct person_t* *table){
 
 
 
-//find a person in the table by their name
+/**
+ * @brief   find a person in the table by their name
+ * 
+ * @param table                 The hash table
+ * @return struct person_t*     The found struct that the user searched for
+ */
 struct person_t* find_person(struct person_t* *table){
 
     char name[MAX_NAME];
@@ -346,18 +359,22 @@ struct person_t* find_person(struct person_t* *table){
         
         //I'm not sure that the first condition is required in the IF statement
         if(table[try_index] && strncmp(table[try_index]->name, name, MAX_NAME) == 0){
-        //if(table[try_index]->name == name){
+
             return table[try_index];
         }
 
     }
-    //printf("%s was not found in the table\n", name);
+
     return NULL;
 }
 
 
 /**
- * @brief   To insert a head node with the External Chaining method... Simply make the 'person' argument the head of linked list.
+ * @brief   To insert a head node with the External Chaining method... \
+            Simply makes 'person' the head of linked list.
+ * 
+ * @param person    The person struct to be inserted... a pointer to that struct to be exact
+ * @param table     The hash table
  */
 void insert_head_external_chaining_method(struct person_t* person, struct person_t* *table){
 
@@ -366,6 +383,7 @@ void insert_head_external_chaining_method(struct person_t* person, struct person
         return;//return false;
     }
 
+    //compute the index value
     int index = hash(person->name);
 
     //create a temporary node to copy the contents of the 'person' argument, so as to not modify 'person'
@@ -379,9 +397,10 @@ void insert_head_external_chaining_method(struct person_t* person, struct person
         exit(1);
     }
     
-    //copy 'person' to head
+    //copy 'person' to head, so that person is modified globally.
     *head = *person;
     
+    //A Deleted Node is a fine spot to place the person
     if(table[index] == DELETED_NODE){
         table[index] = head;
         return;
@@ -392,24 +411,32 @@ void insert_head_external_chaining_method(struct person_t* person, struct person
     //table[index] now is assigned to the head of the linked list, head
     table[index] = head;
 
-    //printf("%p = &person\n%p = &tmp\n%p = &table[index]\n", &person, &tmp, &table[index]);
-    //printf("%d = tmp->age\t%s = tmp->name\n", tmp->age, tmp->name);
     return;
-
 
 }
 
+
+
+/**
+ * @brief   To insert a tail node with the External Chaining method... \
+            Simply makes 'person' the head of linked list.
+ * 
+ * @param person    The person struct to be inserted... a pointer to that struct to be exact
+ * @param table     The hash table
+ */
 void insert_tail_external_chaining(struct person_t* person, struct person_t* *table){
     
 
     //compute the hash value
     int index = hash(person->name);
+
     //disallow the user to insert with the tail method when the current *(table+index) slot is NULL
     if(!(*(table + index))){
         printf("\n**Cannot insert a tail until a head is first placed.**\n");
         return;
     }
 
+    //'tail' is the node to insert, while 'tmp' is used for traversal purposes
     struct person_t *tmp, *tail = NULL;
 
     tail = malloc(sizeof(struct person_t));
@@ -419,23 +446,27 @@ void insert_tail_external_chaining(struct person_t* person, struct person_t* *ta
         exit(1);
     }
     
-    *tail = *person;    //for insertion 
+    //tail needs to be set to 'person', because 'person' cannot be altered...
+    //This is an artifact of when structs were hardcoded into the function in a previous edition.
+    //Not sure if this is necessary now. (see line 300)
+    *tail = *person;    
     
     tmp = table[index];  //for traversal
     
 
     if(table[index] == DELETED_NODE){
-        //printf("\n*******%s tried to insert at the deleted node*******\n",person->name);
+
         table[index] = tail;
         return;
     }
 
+    //crawl so that tmp is the last node
     while(tmp->next){
         tmp = tmp->next;
     }
 
+    //tail is now the last node
     tmp->next = tail;  
-    //tail->next = NULL;  
     
     return;
 }
