@@ -3,7 +3,7 @@ CFLAGS = -g -Wall
 OBJFLAGS = -g -Wall -c
 MATHLIB = -lm
 
-targets =  hash_table_functions hash_table
+targets =  hash_table
 clean_targets = hash_table
 
 all : $(targets)
@@ -13,7 +13,7 @@ all : $(targets)
 hash_table_functions : hash_table_functions.c hash_table.c hash_table.h 
 	$(CC) $(OBJFLAGS) $@.c
 
-hash_table : hash_table.c hash_table.h hash_table_functions
+hash_table : hash_table.c hash_table.h hash_table_functions.o
 	$(CC) $(CFLAGS) hash_table_functions.o $@.c -o $@
 
 #clears the object files and executables from the directory.
